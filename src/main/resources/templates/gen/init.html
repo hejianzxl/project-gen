@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8"/>
+    <title>Maven多模块项目生成工具</title>
+    <script src="/jquery-1.10.2.min.js"></script>
+    <style type="text/css">
+        .main {
+            width: 400px;
+            height: 300px;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            margin: -150px 0 0 -200px;
+            padding: 20px;
+            border: 1px solid gray;
+        }
+    </style>
+</head>
+<body>
+<div class="main">
+    <form action="/project" method="POST">
+        GroupId:<br>
+        <input style="width: 200px;" type="text" name="groupId">
+        <br>
+        ArtifactId:
+        <br>
+        <input type="text" style="width: 200px;" name="artifactId">
+        <br/>
+        Modules:
+        <br/>
+        <select name="modules" class="demo" multiple="multiple" style="width: 205px; height: 150px;">
+            <option th:each="module : ${modules}"
+                    th:value="${module}" th:text="${module}"></option>
+        </select> <br/> <br/>
+        <button type="submit">提交</button>
+        <button type="reset">重置</button>
+
+    </form>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,11 @@
+project:
+  - app
+    - src
+      - mian
+      - test
+    - target
+
+  - web
+  - services
+  - dao
+  - commons

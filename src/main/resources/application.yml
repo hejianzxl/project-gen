@@ -1,0 +1,10 @@
+server:
+  port: 8888
+spring:
+  application:
+    name: project-gen
+
+
+gen:
+  dirPath: /Users/tangmingjian/Downloads/generated／
+
