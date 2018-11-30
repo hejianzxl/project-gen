@@ -7,8 +7,12 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -88,6 +92,10 @@ public class GenController {
     private void setParams(GenParams params) {
         ARTIFACT_ID.set(params.getArtifactId());
         GROUP_ID.set(params.getGroupId());
+        if (CollectionUtils.isEmpty(params.getModules())) {
+            //default generate all modules
+            params.setModules(modules());
+        }
     }
 
     private void checkParams(GenParams params) throws Exception {
@@ -182,7 +190,7 @@ public class GenController {
         File file = new File(filePath);
         Long fileLen = file.length();
         byte[] fileContent = new byte[fileLen.intValue()];
-        try (FileInputStream in = new FileInputStream(file)){
+        try (FileInputStream in = new FileInputStream(file)) {
             in.read(fileContent);
             return new String(fileContent, "utf-8");
         } catch (Exception e) {
