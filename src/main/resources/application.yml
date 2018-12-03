@@ -7,4 +7,5 @@ spring:
 
 gen:
   dirPath: /Users/tangmingjian/Downloads/generated
+  templatesPath: /Users/tangmingjian/IdeaProjects/project-gen/src/main/resources/tpls/gasdf
 
