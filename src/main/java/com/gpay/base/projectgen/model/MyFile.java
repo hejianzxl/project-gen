@@ -4,8 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Objects;
 
 /**
@@ -85,12 +83,5 @@ public class MyFile {
             return new MyFile(this.file, this.empty, this.path, this.isModuleDir, this.fileType, this.targetFilePath);
         }
 
-    }
-
-    public static void main(String[] args) throws Exception {
-        MyFile file = MyFile.builder().file(new File("/a/b/c.java")).build();
-        System.out.println(file);
-        String s = Files.probeContentType(Paths.get("/Users/tangmingjian/IdeaProjects/project-gen/src/main/java/com/gpay/base/projectgen/controller/GenController.java"));
-        System.out.println(s);
     }
 }

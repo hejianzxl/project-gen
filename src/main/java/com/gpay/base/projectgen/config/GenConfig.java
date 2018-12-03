@@ -12,6 +12,13 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @Data
 public class GenConfig {
+    /**
+     * 生成项目的目录
+     */
     private String dirPath;
+    /**
+     * 模版文件的目录
+     */
+    private String templatesPath;
 
 }

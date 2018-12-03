@@ -35,6 +35,6 @@ public class JavaFileService extends AbstractFileService {
                     .replace(".", File.separator);
             return parentDir.getAbsolutePath() + File.separator + pkgPath + File.separator + fileName;
         }
-        return targetContent;
+        return myFile.getTargetFilePath();
     }
 }

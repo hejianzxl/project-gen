@@ -32,16 +32,4 @@ public enum FileType {
                 .findAny()
                 .orElse(FileType.OTHER_FILE);
     }
-
-    public static FileType getFileTypeByPath(final String path) {
-        boolean isFile = path.matches(".*\\.java");
-        if (!isFile) {
-            return DIRECTORY;
-        }
-        return Arrays.stream(FileType.values())
-                .filter(o -> o == DIRECTORY)
-                .filter(o -> path.endsWith(o.getType()))
-                .findAny()
-                .orElse(FileType.OTHER_FILE);
-    }
 }

@@ -8,10 +8,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @author tangmingjian 2018-11-30 下午9:49
@@ -29,9 +25,7 @@ public abstract class AbstractFileService {
             targetContent = replaceMacro(sourceContent);
         }
 
-        if (myFile.getFileType()==FileType.POM_FILE && myFile.isModuleDir()) {
-            targetContent = removeModulesNotSelectedInRootPom(targetContent);
-        }
+        targetContent = specialDealWithFileContent(myFile, targetContent);
 
         writeFile(targetDirPath(myFile, targetContent), targetContent);
     }
@@ -61,22 +55,8 @@ public abstract class AbstractFileService {
     }
 
 
-    private String removeModulesNotSelectedInRootPom(String content){
-        return Arrays.stream(content.split(System.getProperty("line.separator", "\n")))
-                .filter(o->!needRemove(o))
-                .reduce((l1,l2)->l1+System.getProperty("line.separator", "\n")+l2)
-                .get();
-    }
-
-
-    private boolean needRemove(String line){
-        List<String> allModules = ParamsHelper.modules();
-        List<String> modulesSelected = ParamsHelper.modulesSelected();
-        allModules.removeAll(modulesSelected);
-        return allModules.stream()
-                .map(o -> "<module>" + ParamsHelper.artifactId() + "-" + o+"</module>")
-                .anyMatch(o->line.indexOf(o)>0);
-
+    protected String specialDealWithFileContent(MyFile myFile, String content) {
+        return content;
     }
 
     private void writeFile(String targetDir, String content) throws IOException {

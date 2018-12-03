@@ -12,6 +12,7 @@ import com.gpay.base.projectgen.util.ZipUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -46,22 +47,30 @@ public class GenController {
     @GetMapping
     @ApiOperation(value = "gen a project init")
     public String preGen(Model model) {
-        model.addAttribute("modules", modules());
+        try {
+            model.addAttribute("modules", modules());
+        } catch (Exception e) {
+            log.error("init error", e);
+            model.addAttribute("msg", e);
+            return "error";
+        }
         return "gen/init";
     }
 
     private List<String> modules() {
-        URL tplUrl = this.getClass().getResource("/tpls");
-        log.info("template url:{}", tplUrl);
-        File file = new File(tplUrl.getFile());
-        if (!file.exists()) {
-            log.info("template url:{} not exist");
-            return null;
-        }
-        return Arrays.stream(file.listFiles())
+        return Arrays.stream(templatesFile().listFiles())
                 .filter(File::isDirectory)
                 .map(File::getName)
                 .collect(Collectors.toList());
+    }
+
+    private File templatesFile() {
+        String templatesPath = genConfig.getTemplatesPath();
+        File file = new File(templatesPath);
+        if (!file.exists()) {
+            throw new RuntimeException("templates:" + templatesPath + "文件不存在");
+        }
+        return file;
     }
 
     @PostMapping
@@ -75,9 +84,15 @@ public class GenController {
             //set params
             setParams(params);
 
+            //collect all files to generate
             List<MyFile> myFiles = collectFiles();
 
+            //delete previous generated
+            deletePreviousGenerated();
+
+            // make file
             makeDirectoryOrFile(myFiles);
+
             //zip project
             String filePath = ZipUtils.zip(targetDir());
 
@@ -96,7 +111,7 @@ public class GenController {
      * @param params 参数
      * @throws Exception
      */
-    private void checkParams(GenParams params) throws Exception {
+    private void checkParams(GenParams params) {
         if (StringUtils.isEmpty(params.getArtifactId()) || StringUtils.isEmpty(params.getGroupId())) {
             throw new IllegalArgumentException("params error");
         }
@@ -126,14 +141,8 @@ public class GenController {
      * @return allFiles to make
      */
     private List<MyFile> collectFiles() {
-        URL tmpUrl = this.getClass().getResource("/tpls");//todo 解决jar包读取不到的问题
-        if (tmpUrl == null) {
-            log.info("can't find templates dir");
-            throw new RuntimeException("can't find templates dir");
-        }
-        File tmpDir = new File(tmpUrl.getFile());
         List<MyFile> allFiles = new ArrayList();
-        List<MyFile> rootFiles = Arrays.stream(tmpDir.listFiles())
+        List<MyFile> rootFiles = Arrays.stream(templatesFile().listFiles())
                 .filter(this::selected)
                 .map(this::mavenModuleFile)
                 .collect(Collectors.toList());
@@ -143,6 +152,15 @@ public class GenController {
 
         log.info("all files:{}", JSON.toJSONString(allFiles));
         return allFiles;
+    }
+
+    private String templatesDirPath() {
+        URL tmpUrl = this.getClass().getResource("/tpls");
+        if (tmpUrl == null) {
+            log.info("can't find templates dir");
+            throw new RuntimeException("can't find templates dir");
+        }
+        return tmpUrl.getFile();
     }
 
     private boolean selected(File file) {
@@ -199,6 +217,19 @@ public class GenController {
         }
     }
 
+    private void deletePreviousGenerated() throws Exception {
+        String dirPath = genConfig.getDirPath();
+        if (!dirPath.endsWith(File.separator)) {
+            dirPath = dirPath + File.separator;
+        }
+        dirPath = dirPath + ParamsHelper.artifactId();
+        File dir = new File(dirPath);
+        if (dir.exists()) {
+            log.info("delete previous generated dir:{}", dir.getPath());
+            FileUtils.deleteDirectory(dir);
+        }
+    }
+
     /**
      * 创建所有文件
      *
@@ -242,7 +273,7 @@ public class GenController {
         return dirPath;
     }
 
-    private void writeFileIntoResponse(String filePath, HttpServletResponse response) throws Exception {
+    private void writeFileIntoResponse(String filePath, HttpServletResponse response) {
         File file = new File(filePath);
         if (!file.exists()) {
             log.info("file:{} not exist", filePath);
