@@ -17,7 +17,7 @@ import java.io.IOException;
  * @date 2018/11/22 16:55
  */
 public class CrosFilter  implements Filter {
-    private static final Logger logger= LoggerFactory.getLogger(CrosFilter.CrosFilter.class);
+    private static final Logger logger= LoggerFactory.getLogger(CrosFilter.class);
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
 
