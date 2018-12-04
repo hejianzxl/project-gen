@@ -1,1 +1,1 @@
-package ${groupId}.app;
+package ${groupId};
