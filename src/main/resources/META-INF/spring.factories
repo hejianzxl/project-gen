@@ -1,0 +1,4 @@
+com.yiyi.tang.projectgen.service.AbstractFileService=\
+com.yiyi.tang.projectgen.service.impl.JavaFileService,\
+com.yiyi.tang.projectgen.service.impl.OtherFileService,\
+com.yiyi.tang.projectgen.service.impl.PomFileService
